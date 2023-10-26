@@ -5,14 +5,20 @@ from datetime import datetime
 import os
 import smtplib
 from email.mime.text import MIMEText
-import sys
 
-args = sys.argv
+file = "/home/arthur/Documents/halo-session/session_infos.txt"
 
-email = args[1]
-pseudo = args[2]
-sender_email = args[3]
-sender_password = args[4]
+email = ""
+pseudo = ""
+sender_email = ""
+sender_password = ""
+
+with open(file, "r") as f:
+	email = f.readline()
+	pseudo = f.readline()
+	sender_email = f.readline()
+	sender_password = f.readline()
+
 mailing = True
 
 today = datetime.now()
