@@ -3,8 +3,9 @@
 import discord
 import requests
 import asyncio
+import os
 
-TOKEN = ""
+TOKEN = os.getenv("DISCORD_HALO_SESSION_BOT_TOKEN")
 
 intents = discord.Intents.default()
 intents.message_content = True
