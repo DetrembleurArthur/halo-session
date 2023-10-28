@@ -52,67 +52,77 @@ class LastGame:
 
 	def __init__(self, pseudo):
 		self.pseudo = pseudo
+		self.game_id = "empty"
+		self.changed = False
 
 	def update(self):
 		json = halo.get_last_game(self.pseudo)
-		self.map_name = json["details"]["map"]["name"]
-		self.game_mode = json["details"]["ugcgamevariant"]["name"]
-		self.player_rank = json["player"]["rank"]
-		self.winner = json["player"]["outcome"]
-		self.player_team = json["player"]["properties"]["team"]["name"]
-		self.player_kills = IncrementalVar(json["player"]["stats"]["core"]["summary"]["kills"])
-		self.player_deaths = IncrementalVar(json["player"]["stats"]["core"]["summary"]["deaths"])
-		self.player_assists = IncrementalVar(json["player"]["stats"]["core"]["summary"]["assists"])
-		self.player_betrayals = IncrementalVar(json["player"]["stats"]["core"]["summary"]["betrayals"])
-		self.player_suicides = IncrementalVar(json["player"]["stats"]["core"]["summary"]["suicides"])
-		self.max_killing_spree = IncrementalVar(json["player"]["stats"]["core"]["summary"]["max_killing_spree"])
-		self.medals_number = IncrementalVar(json["player"]["stats"]["core"]["summary"]["medals"]["total"])
-		self.damage_taken = IncrementalVar(json["player"]["stats"]["core"]["damage"]["taken"])
-		self.damage_dealt = IncrementalVar(json["player"]["stats"]["core"]["damage"]["dealt"])
-		self.shots_fired = IncrementalVar(json["player"]["stats"]["core"]["shots"]["fired"])
-		self.shots_hit = IncrementalVar(json["player"]["stats"]["core"]["shots"]["hit"])
-		self.shots_missed = IncrementalVar(json["player"]["stats"]["core"]["shots"]["missed"])
-		self.shots_accuracy = json["player"]["stats"]["core"]["shots"]["accuracy"]
-		self.medals = Medals(json["player"]["stats"]["core"]["breakdown"]["medals"])
-		self.ratio = json["player"]["stats"]["core"]["kdr"]
-		self.average_life_duration = json["player"]["stats"]["core"]["average_life_duration"]["human"]
-		self.score = IncrementalVar(json["player"]["stats"]["core"]["scores"]["personal"])
-		self.duration = json["playable_duration"]["human"]
+		self.changed = self.game_id != json["id"]
+		if self.changed:
+			self.game_id = json["id"]
+			self.map_name = json["details"]["map"]["name"]
+			self.game_mode = json["details"]["ugcgamevariant"]["name"]
+			self.player_rank = json["player"]["rank"]
+			self.winner = json["player"]["outcome"]
+			self.player_team = json["player"]["properties"]["team"]["name"]
+			self.player_kills = IncrementalVar(json["player"]["stats"]["core"]["summary"]["kills"])
+			self.player_deaths = IncrementalVar(json["player"]["stats"]["core"]["summary"]["deaths"])
+			self.player_assists = IncrementalVar(json["player"]["stats"]["core"]["summary"]["assists"])
+			self.player_betrayals = IncrementalVar(json["player"]["stats"]["core"]["summary"]["betrayals"])
+			self.player_suicides = IncrementalVar(json["player"]["stats"]["core"]["summary"]["suicides"])
+			self.max_killing_spree = IncrementalVar(json["player"]["stats"]["core"]["summary"]["max_killing_spree"])
+			self.medals_number = IncrementalVar(json["player"]["stats"]["core"]["summary"]["medals"]["total"])
+			self.damage_taken = IncrementalVar(json["player"]["stats"]["core"]["damage"]["taken"])
+			self.damage_dealt = IncrementalVar(json["player"]["stats"]["core"]["damage"]["dealt"])
+			self.shots_fired = IncrementalVar(json["player"]["stats"]["core"]["shots"]["fired"])
+			self.shots_hit = IncrementalVar(json["player"]["stats"]["core"]["shots"]["hit"])
+			self.shots_missed = IncrementalVar(json["player"]["stats"]["core"]["shots"]["missed"])
+			self.shots_accuracy = json["player"]["stats"]["core"]["shots"]["accuracy"]
+			self.medals = Medals(json["player"]["stats"]["core"]["breakdown"]["medals"])
+			self.ratio = json["player"]["stats"]["core"]["kdr"]
+			self.average_life_duration = json["player"]["stats"]["core"]["average_life_duration"]["human"]
+			self.score = IncrementalVar(json["player"]["stats"]["core"]["scores"]["personal"])
+			self.duration = json["playable_duration"]["human"]
 
 	def to_str(self):
 		return f"""
-Last game for {self.pseudo}
 
-Map: {self.map_name}
-Mode: {self.game_mode}
-Status: {self.winner}
+Last game for **{self.pseudo}** :sunglasses:
 
-Score: {self.score.acc} (+{self.score.value})
+:map: Map: **{self.map_name}**
+:triangular_flag_on_post: Mode: **{self.game_mode}**
+:v: Status: **{self.winner}**
 
-Team: {self.player_team}
-Rank: {self.player_rank}
+:video_game: Score: **{self.score.acc}** (+{self.score.value})
 
-Kills: {self.player_kills.acc} (+{self.player_kills.value})
-Deaths: {self.player_deaths.acc} (+{self.player_deaths.value})
-Assists: {self.player_assists.acc} (+{self.player_assists.value})
-Betrayals: {self.player_betrayals.acc} (+{self.player_betrayals.value})
-Suicides: {self.player_suicides.acc} (+{self.player_suicides.value})
-Max killing spree: {self.max_killing_spree.acc} (+{self.max_killing_spree.value})
-Medals number: {self.medals_number.acc} (+{self.medals_number.value})
+:person_in_steamy_room: Team: **{self.player_team}**
+:man_student: Rank: **{self.player_rank}**
 
-Damage taken: {self.damage_taken.acc} (+{self.damage_taken.value})
-Damage dealt: {self.damage_dealt.acc} (+{self.damage_dealt.value})
+:archery: Kills: **{self.player_kills.acc}** (***+{self.player_kills.value}***)
+:skull: Deaths: **{self.player_deaths.acc}** (***+{self.player_deaths.value}***)
+:smiling_face_with_tear: Assists: **{self.player_assists.acc}** (***+{self.player_assists.value}***)
+:cold_face: Betrayals: **{self.player_betrayals.acc}** (***+{self.player_betrayals.value}***)
+:zany_face: Suicides: **{self.player_suicides.acc}** (***+{self.player_suicides.value}***)
+:ok_hand: Max killing spree: **{self.max_killing_spree.acc}** (***+{self.max_killing_spree.value}***)
+:medal: Medals number: **{self.medals_number.acc}** (***+{self.medals_number.value}***)
 
-Shots fired: {self.shots_fired.acc} (+{self.shots_fired.value})
-Shots hit: {self.shots_hit.acc} (+{self.shots_hit.value})
-Shots missed: {self.shots_missed.acc} (+{self.shots_missed.value})
-Shot accuracy: {self.shots_accuracy}
+:dagger: Damage taken: **{self.damage_taken.acc}** (***+{self.damage_taken.value}***)
+:boom: Damage dealt: **{self.damage_dealt.acc}** (***+{self.damage_dealt.value}***)
 
-Average life duration: {self.average_life_duration}
-Game duration: {self.duration}
+:fire: Shots fired: **{self.shots_fired.acc}** (***+{self.shots_fired.value}***)
+:heart_on_fire: Shots hit: **{self.shots_hit.acc}** (***+{self.shots_hit.value}***)
+:firefighter: Shots missed: **{self.shots_missed.acc}** (***+{self.shots_missed.value}***)
+:dart: Shot accuracy: **{self.shots_accuracy:.2f}%**
+
+:alarm_clock: Average life duration: **{self.average_life_duration}**
+:clock: Game duration: **{self.duration}**
 """
 
 if __name__ == "__main__":
 	lastGame = LastGame("SirArthurias")
 	lastGame.update()
 	lastGame.medals.create_image()
+
+
+
+

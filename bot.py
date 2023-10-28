@@ -8,6 +8,9 @@ import os
 from halostats import *
 
 TOKEN = os.getenv("DISCORD_HALO_SESSION_BOT_TOKEN")
+if TOKEN is None:
+	import sys
+	TOKEN = sys.argv[1]
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -25,6 +28,7 @@ async def last_game(message):
 	lastGame = LastGame(pseudo)
 	lastGame.update()
 	await message.channel.send(lastGame.to_str())
+	await message.channel.send(f"\n{pseudo}'s medals:")
 	image = lastGame.medals.create_image(pseudo)
 	await message.channel.send(file=discord.File(image, filename=f"{pseudo}-medals.png"))
 
@@ -38,11 +42,13 @@ async def start_session(message):
 		while pseudo in sessions.keys():
 			print("update...")
 			lastGame.update()
-			await message.channel.send(lastGame.to_str())
-			image = lastGame.medals.create_image(pseudo)
-			await message.channel.send(file=discord.File(image, filename=f"{pseudo}-medals.png"))
-			print("sleep for 40s...")
-			await asyncio.sleep(40)
+			if lastGame.changed:
+				await message.channel.send(lastGame.to_str())
+				await message.channel.send(f"\n{pseudo}'s medals:")
+				image = lastGame.medals.create_image(pseudo)
+				await message.channel.send(file=discord.File(image, filename=f"{pseudo}-medals.png"))
+			print("sleep for 30s...")
+			await asyncio.sleep(30)
 
 @bot.command(name="stop")
 async def stop_session(message):
