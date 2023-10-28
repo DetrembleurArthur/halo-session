@@ -36,7 +36,7 @@ async def last_game(message):
 async def start_session(message):
 	pseudo = message.author.nick
 	if pseudo not in sessions.keys():
-		sessions[pseudo] = {"lastGame" : LastGame(pseudo)}
+		sessions[pseudo] = {"lastGame" : LastGame(pseudo, skip_first=True)}
 		lastGame = sessions[pseudo]["lastGame"]
 		await message.channel.send(f"{pseudo}'s session started\n")
 		while pseudo in sessions.keys():

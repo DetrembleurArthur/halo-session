@@ -50,13 +50,30 @@ class Medals:
 
 class LastGame:
 
-	def __init__(self, pseudo):
+	def __init__(self, pseudo, skip_first=False):
 		self.pseudo = pseudo
 		self.game_id = "empty"
 		self.changed = False
+		self.skip_first = skip_first
+		self.player_kills = IncrementalVar()
+		self.player_deaths = IncrementalVar()
+		self.player_assists = IncrementalVar()
+		self.player_betrayals = IncrementalVar()
+		self.player_suicides = IncrementalVar()
+		self.max_killing_spree = IncrementalVar()
+		self.medals_number = IncrementalVar()
+		self.damage_taken = IncrementalVar()
+		self.damage_dealt = IncrementalVar()
+		self.shots_fired = IncrementalVar()
+		self.shots_hit = IncrementalVar()
+		self.shots_missed = IncrementalVar()
+		self.score = IncrementalVar()
 
 	def update(self):
 		json = halo.get_last_game(self.pseudo)
+		if self.skip_first:
+			self.game_id = json["id"]
+			self.skip_first = False
 		self.changed = self.game_id != json["id"]
 		if self.changed:
 			self.game_id = json["id"]
@@ -65,23 +82,23 @@ class LastGame:
 			self.player_rank = json["player"]["rank"]
 			self.winner = json["player"]["outcome"]
 			self.player_team = json["player"]["properties"]["team"]["name"]
-			self.player_kills = IncrementalVar(json["player"]["stats"]["core"]["summary"]["kills"])
-			self.player_deaths = IncrementalVar(json["player"]["stats"]["core"]["summary"]["deaths"])
-			self.player_assists = IncrementalVar(json["player"]["stats"]["core"]["summary"]["assists"])
-			self.player_betrayals = IncrementalVar(json["player"]["stats"]["core"]["summary"]["betrayals"])
-			self.player_suicides = IncrementalVar(json["player"]["stats"]["core"]["summary"]["suicides"])
-			self.max_killing_spree = IncrementalVar(json["player"]["stats"]["core"]["summary"]["max_killing_spree"])
-			self.medals_number = IncrementalVar(json["player"]["stats"]["core"]["summary"]["medals"]["total"])
-			self.damage_taken = IncrementalVar(json["player"]["stats"]["core"]["damage"]["taken"])
-			self.damage_dealt = IncrementalVar(json["player"]["stats"]["core"]["damage"]["dealt"])
-			self.shots_fired = IncrementalVar(json["player"]["stats"]["core"]["shots"]["fired"])
-			self.shots_hit = IncrementalVar(json["player"]["stats"]["core"]["shots"]["hit"])
-			self.shots_missed = IncrementalVar(json["player"]["stats"]["core"]["shots"]["missed"])
+			self.player_kills.set(json["player"]["stats"]["core"]["summary"]["kills"])
+			self.player_deaths.set(json["player"]["stats"]["core"]["summary"]["deaths"])
+			self.player_assists.set(json["player"]["stats"]["core"]["summary"]["assists"])
+			self.player_betrayals.set(json["player"]["stats"]["core"]["summary"]["betrayals"])
+			self.player_suicides.set(json["player"]["stats"]["core"]["summary"]["suicides"])
+			self.max_killing_spree.set(json["player"]["stats"]["core"]["summary"]["max_killing_spree"])
+			self.medals_number.set(json["player"]["stats"]["core"]["summary"]["medals"]["total"])
+			self.damage_taken.set(json["player"]["stats"]["core"]["damage"]["taken"])
+			self.damage_dealt.set(json["player"]["stats"]["core"]["damage"]["dealt"])
+			self.shots_fired.set(json["player"]["stats"]["core"]["shots"]["fired"])
+			self.shots_hit.set(json["player"]["stats"]["core"]["shots"]["hit"])
+			self.shots_missed.set(json["player"]["stats"]["core"]["shots"]["missed"])
 			self.shots_accuracy = json["player"]["stats"]["core"]["shots"]["accuracy"]
 			self.medals = Medals(json["player"]["stats"]["core"]["breakdown"]["medals"])
 			self.ratio = json["player"]["stats"]["core"]["kdr"]
 			self.average_life_duration = json["player"]["stats"]["core"]["average_life_duration"]["human"]
-			self.score = IncrementalVar(json["player"]["stats"]["core"]["scores"]["personal"])
+			self.score.set(json["player"]["stats"]["core"]["scores"]["personal"])
 			self.duration = json["playable_duration"]["human"]
 
 	def to_str(self):
