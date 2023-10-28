@@ -4,6 +4,7 @@ import requests
 from io import BytesIO
 import time
 import os
+from datetime import datetime
 
 def local_medal_file_exists(medal_id):
 	return os.path.exists(f"/home/arthur/Documents/halo-session/medals/{medal_id}.png")
@@ -35,8 +36,9 @@ class Medals:
 			self.size += medal[1]
 
 	def create_image(self, pseudo) -> Image:
-		image = Image.new('RGBA', (5*128, self.size//5*128))
-		print("size:", (5*128, self.size//5*128))
+		width = 8
+		image = Image.new('RGBA', (width*128, self.size//width*128))
+		print("size:", (width*128, self.size//width*128))
 		temp = 0
 		for medal in self.infos:
 			medal_image = None
@@ -50,8 +52,8 @@ class Medals:
 				print(f"load local medal image /home/arthur/Documents/halo-session/medals/{medal[0]}.png")
 			medal_count = medal[1]
 			for i in range(medal_count):
-				print((temp%5*128, temp//5*128))
-				image.paste(medal_image, box=(temp%5*128, temp//5*128))
+				print((temp%width*128, temp//width*128))
+				image.paste(medal_image, box=(temp%width*128, temp//width*128))
 				temp += 1
 		binary = BytesIO()
 		image.save(binary, "PNG")
@@ -148,10 +150,14 @@ Last game for **{self.pseudo}** :sunglasses:
 
 :alarm_clock: Average life duration: **{self.average_life_duration}**
 :clock: Game duration: **{self.duration}**
+
+Last update at {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}
+
+
 """
 
 if __name__ == "__main__":
-	Medals.fetch_images()
+	pass
 
 
 
