@@ -3,6 +3,10 @@ from PIL import Image
 import requests
 from io import BytesIO
 import time
+import os
+
+def local_medal_file_exists(medal_id):
+	return os.path.exists(f"/home/arthur/Documents/halo-session/medals/{medal_id}.png")
 
 
 def url_to_image(url):
@@ -35,9 +39,16 @@ class Medals:
 		print("size:", (5*128, self.size//5*128))
 		temp = 0
 		for medal in self.infos:
-			url = halo.medal_url(medal[0])
+			medal_image = None
+			if not local_medal_file_exists(medal[0]):
+				url = halo.medal_url(medal[0])
+				medal_image = url_to_image(url)
+				medal_image.save(f"/home/arthur/Documents/halo-session/medals/{medal[0]}.png")
+				print(f"save local medal image /home/arthur/Documents/halo-session/medals/{medal[0]}.png")
+			else:
+				medal_image = Image.open(f"/home/arthur/Documents/halo-session/medals/{medal[0]}.png")
+				print(f"load local medal image /home/arthur/Documents/halo-session/medals/{medal[0]}.png")
 			medal_count = medal[1]
-			medal_image = url_to_image(url)
 			for i in range(medal_count):
 				print((temp%5*128, temp//5*128))
 				image.paste(medal_image, box=(temp%5*128, temp//5*128))
@@ -46,6 +57,10 @@ class Medals:
 		image.save(binary, "PNG")
 		binary.seek(0)
 		return binary
+
+	@staticmethod
+	def fetch_images():
+		pass
 
 
 class LastGame:
@@ -136,9 +151,7 @@ Last game for **{self.pseudo}** :sunglasses:
 """
 
 if __name__ == "__main__":
-	lastGame = LastGame("SirArthurias")
-	lastGame.update()
-	lastGame.medals.create_image()
+	Medals.fetch_images()
 
 
 

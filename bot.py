@@ -23,8 +23,8 @@ sessions = {}
 
 
 @bot.command(name="last")
-async def last_game(message):
-	pseudo = message.author.nick
+async def last_game(message, pseudo=None):
+	pseudo = pseudo if pseudo != None else message.author.nick
 	lastGame = LastGame(pseudo)
 	lastGame.update()
 	await message.channel.send(lastGame.to_str())

@@ -3,7 +3,7 @@ __pycache__/
 session_infos.txt
 *.py[cod]
 *$py.class
-
+medals/
 # C extensions
 *.so
 
