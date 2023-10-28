@@ -75,7 +75,7 @@ async def pooling(message, pseudo=None):
 				del sessions[pseudo]
 				await message.channel.send("***Sirarthurias session stopped***")
 				break
-			await asyncio.sleep(5)
+			await asyncio.sleep(30)
 	else:
 		await message.channel.send("***\nAlready started***")
 
