@@ -1,6 +1,7 @@
 # bot.py
 
 import discord
+from discord.ext import commands
 import requests
 import asyncio
 import os
@@ -10,7 +11,8 @@ TOKEN = os.getenv("DISCORD_HALO_SESSION_BOT_TOKEN")
 intents = discord.Intents.default()
 intents.message_content = True
 
-client = discord.Client(intents=intents)
+#client = discord.Client(intents=intents)
+bot = commands.Bot(command_prefix="!",intents=intents)
 
 sessions = {}
 
@@ -64,6 +66,7 @@ async def check(message, pseudo=None, shownull=True):
 	Session kills: {kills}(+{delta_kills})***
 	""")
 
+@bot.command(name="start")
 async def pooling(message, pseudo=None):
 	global sessions
 	if pseudo is None: pseudo = message.author.nick
@@ -96,25 +99,10 @@ command_map = {
 	"!stop": stop
 }
 
-@client.event
+@bot.event
 async def on_ready():
-	print(f'{client.user} has connected to Discord!')
+	print(f'{bot.user} has connected to Discord!')
 
-@client.event
-async def on_message(message):
-	try:
-		print(message.content)
-		if message.author == client.user: return
-		tokens = message.content.split(" ")
-		if len(tokens) > 0 and tokens[0].startswith('!'):
-			if tokens[0] in command_map:
-				command = command_map[tokens[0]]
-				if len(tokens) > 1:
-					await command(message, *tokens[1::])
-				else:
-					await command(message)
-	except Exception as e:
-		await message.channel.send("***Bad command utilisation... try again***")
-		raise e
 
-client.run(TOKEN)
+#client.run(TOKEN)
+bot.run(TOKEN)
