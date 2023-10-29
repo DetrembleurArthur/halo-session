@@ -4,6 +4,7 @@ session_infos.txt
 *.py[cod]
 *$py.class
 medals/
+users.txt
 # C extensions
 *.so
 
