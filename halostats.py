@@ -37,7 +37,7 @@ class Medals:
 
 	def create_image(self, pseudo) -> Image:
 		width = 8
-		image = Image.new('RGBA', (width*128, self.size//width*128))
+		image = Image.new('RGBA', (width*128, self.size//width*128+int(self.size%width!=0)*128))
 		print("size:", (width*128, self.size//width*128))
 		temp = 0
 		for medal in self.infos:
