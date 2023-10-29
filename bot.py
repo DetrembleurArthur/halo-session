@@ -6,6 +6,7 @@ import requests
 import asyncio
 import os
 from halostats import *
+import json
 
 TOKEN = os.getenv("DISCORD_HALO_SESSION_BOT_TOKEN")
 if TOKEN is None:
@@ -20,6 +21,12 @@ bot = commands.Bot(command_prefix="!",intents=intents)
 
 
 sessions = {}
+users = {}
+
+def get_pseudo(message, pseudo=None):
+	if pseudo is not None: return pseudo
+	if message.author in users.keys(): return users[message.author]["pseudo"]
+	return message.author
 
 async def private_message(message, text):
 	dm_channel = await message.author.create_dm()
@@ -32,7 +39,7 @@ async def private_image(message, image):
 
 @bot.command(name="last")
 async def last_game(message, pseudo=None):
-	pseudo = pseudo if pseudo != None else message.author.nick
+	pseudo = get_pseudo(message, pseudo)
 	lastGame = LastGame(pseudo)
 	lastGame.update()
 	await private_message(message, lastGame.to_str())
@@ -42,7 +49,7 @@ async def last_game(message, pseudo=None):
 
 @bot.command(name="start")
 async def start_session(message, pseudo=None):
-	pseudo = pseudo if pseudo != None else message.author.nick
+	pseudo = get_pseudo(message, pseudo)
 	if pseudo not in sessions.keys():
 		sessions[pseudo] = {"lastGame" : LastGame(pseudo, skip_first=True)}
 		lastGame = sessions[pseudo]["lastGame"]
@@ -60,18 +67,31 @@ async def start_session(message, pseudo=None):
 
 @bot.command(name="stop")
 async def stop_session(message, pseudo=None):
-	pseudo = pseudo if pseudo != None else message.author.nick
+	pseudo = get_pseudo(message, pseudo)
 	if pseudo in sessions.keys():
 		del sessions[pseudo]
 		await private_message(message, f"{pseudo}'s session stopped")
 	else:
 		await private_message(message, f"{pseudo} has no session")
 
-
+@bot.command(name="pseudo")
+async def register_pseudo(message, pseudo):
+	if message.author not in users.keys():
+		users[message.author] = {"pseudo" : pseudo}
+	else:
+		users[message.author]["pseudo"] = pseudo
+	with open('/home/arthur/Documents/halo-session/users.json', 'w') as file:
+		file.write(users)
+	print(f"{pseudo} saved")
+	await private_message(message, f"**{pseudo}** registered for ***{message.author}***")
 
 @bot.event
 async def on_ready():
+	global users
 	print(f'{bot.user} has connected to Discord!')
+	with open('/home/arthur/Documents/halo-session/users.json', 'r') as file:
+		users = json.load(file)
+	print("users loaded")
 
 
 
