@@ -4,10 +4,11 @@ session_infos.txt
 *.py[cod]
 *$py.class
 medals/
+sessions/
 users.txt
 # C extensions
 *.so
-
+*.pkl
 # Distribution / packaging
 .Python
 build/

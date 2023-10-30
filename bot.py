@@ -7,7 +7,9 @@ import asyncio
 import os
 from halostats import *
 import json
+from datetime import date
 
+DIR = "/home/arthur/Documents/halo-session/"
 TOKEN = os.getenv("DISCORD_HALO_SESSION_BOT_TOKEN")
 if TOKEN is None:
 	import sys
@@ -24,7 +26,7 @@ sessions = {}
 users = {}
 
 def save_users():
-	with open('/home/arthur/Documents/halo-session/users.json', 'w') as file:
+	with open(f'{DIR}users.json', 'w') as file:
 		file.write(json.dumps(users, indent=4))
 
 def get_pseudo(message, pseudo=None):
@@ -70,13 +72,16 @@ async def start_session(message, pseudo=None):
 	await clear_messages(message)
 	pseudo = get_pseudo(message, pseudo)
 	if pseudo not in sessions.keys():
-		sessions[pseudo] = {"lastGame" : LastGame(pseudo, skip_first=True)}
+		current_date = date.today()
+		sessions[pseudo] = {"lastGame" : LastGame.load(f"{DIR}sessions/{pseudo}-{current_date}.pkl")}
 		lastGame = sessions[pseudo]["lastGame"]
+		lastGame.skip_first = True
 		await message.channel.send(f"{pseudo}'s session started\n")
 		while pseudo in sessions.keys():
 			print("update...")
 			lastGame.update()
 			if lastGame.changed:
+				lastGame.save(f"{DIR}sessions/{pseudo}-{current_date}.pkl")
 				await clear_messages(message)
 				await private_message(message, lastGame.to_str())
 				target_perc = get_target_percentage(lastGame, message.author.name)
@@ -134,7 +139,7 @@ async def whoami(message, pseudo=None):
 async def on_ready():
 	global users
 	print(f'{bot.user} has connected to Discord!')
-	with open('/home/arthur/Documents/halo-session/users.json', 'r') as file:
+	with open(f'{DIR}users.json', 'r') as file:
 		users = json.load(file)
 	print("users loaded")
 
