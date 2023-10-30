@@ -23,6 +23,10 @@ bot = commands.Bot(command_prefix="!",intents=intents)
 sessions = {}
 users = {}
 
+def save_users():
+	with open('/home/arthur/Documents/halo-session/users.json', 'w') as file:
+		file.write(json.dumps(users, indent=4))
+
 def get_pseudo(message, pseudo=None):
 	if pseudo is not None: return pseudo
 	if message.author.name in users.keys(): return users[message.author.name]["pseudo"]
@@ -42,17 +46,24 @@ async def clear_messages(message):
 		if message_.author == bot.user:
 			await message_.delete()
 
+def get_target_percentage(lastGame: LastGame, author_name: str):
+	target_xp = users[author_name]["target_xp"]
+	current_session_xp = lastGame.score.acc
+	if target_xp > 0:
+		ratio = current_session_xp / target_xp
+		return ratio * 100.0
+
 @bot.command(name="last")
 async def last_game(message, pseudo=None):
 	await clear_messages(message)
 	pseudo = get_pseudo(message, pseudo)
 	lastGame = LastGame(pseudo)
 	lastGame.update()
-	async with message.typing():
-		await private_message(message, lastGame.to_str())
-		await private_message(message, f"\n\n{pseudo}'s medals:")
+	await private_message(message, lastGame.to_str())
+	if lastGame.medals_number.value > 0:
+		await private_message(message, f"**{pseudo}**'s medals:")
 		image = lastGame.medals.create_image(pseudo)
-		await private_image(message, discord.File(image, filename=f"{pseudo}-medals.png"))
+		async with message.typing(): await private_image(message, discord.File(image, filename=f"{pseudo}-medals.png"))
 
 @bot.command(name="start")
 async def start_session(message, pseudo=None):
@@ -66,12 +77,15 @@ async def start_session(message, pseudo=None):
 			print("update...")
 			lastGame.update()
 			if lastGame.changed:
-				async with message.typing():
-					await clear_messages(message)
-					await private_message(message, lastGame.to_str())
-					await private_message(message, f"\n{pseudo}'s medals:")
+				await clear_messages(message)
+				await private_message(message, lastGame.to_str())
+				target_perc = get_target_percentage(lastGame, message.author.name)
+				if target_perc != None:
+					await private_message(message, f":goal: Goal xp: **{lastGame.score.acc}** / **{users[author_name]['target_xp']}** -> ***{target_perc:.2f}%***")
+				if lastGame.medals_number.value > 0:
+					await private_message(message, f"**{pseudo}**'s medals:")
 					image = lastGame.medals.create_image(pseudo)
-					await private_image(message, discord.File(image, filename=f"{pseudo}-medals.png"))
+					async with message.typing(): await private_image(message, discord.File(image, filename=f"{pseudo}-medals.png"))
 			print("sleep for 30s...")
 			await asyncio.sleep(30)
 
@@ -89,13 +103,26 @@ async def stop_session(message, pseudo=None):
 async def register_pseudo(message, pseudo):
 	await clear_messages(message)
 	if message.author not in users.keys():
-		users[message.author.name] = {"pseudo" : pseudo}
+		users[message.author.name] = {"pseudo" : pseudo, "target_xp" : 0}
 	else:
 		users[message.author.name]["pseudo"] = pseudo
-	with open('/home/arthur/Documents/halo-session/users.json', 'w') as file:
-		file.write(json.dumps(users, indent=4))
+	save_users()
 	print(f"{pseudo} saved")
 	await private_message(message, f"**{pseudo}** registered for ***{message.author}***")
+
+@bot.command(name="target")
+async def target(message, target_xp: int=None, pseudo=None):
+	await clear_messages(message)
+	pseudo = get_pseudo(message, pseudo)
+	if message.author.name in users.keys() and target_xp != None:
+		target_xp = int(target_xp)
+		users[message.author.name]["target_xp"] = target_xp
+		save_users()
+		await private_message(message, f"Target xp set for **{pseudo}**: **{target_xp}xp**")
+	elif target_xp == None:
+		await private_message(message, f"Target xp for **{pseudo}** is **{users[message.author.name]['target_xp']}xp**")
+	else:
+		await private_message(message, f"Target xp not set for **{pseudo}**, please retry")
 
 @bot.command(name="whoami")
 async def whoami(message, pseudo=None):

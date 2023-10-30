@@ -77,7 +77,7 @@ class LastGame:
 		self.player_assists = IncrementalVar()
 		self.player_betrayals = IncrementalVar()
 		self.player_suicides = IncrementalVar()
-		self.max_killing_spree = IncrementalVar()
+		self.max_killing_spree = 0
 		self.medals_number = IncrementalVar()
 		self.damage_taken = IncrementalVar()
 		self.damage_dealt = IncrementalVar()
@@ -104,7 +104,7 @@ class LastGame:
 			self.player_assists.set(json["player"]["stats"]["core"]["summary"]["assists"])
 			self.player_betrayals.set(json["player"]["stats"]["core"]["summary"]["betrayals"])
 			self.player_suicides.set(json["player"]["stats"]["core"]["summary"]["suicides"])
-			self.max_killing_spree.set(json["player"]["stats"]["core"]["summary"]["max_killing_spree"])
+			self.max_killing_spree = json["player"]["stats"]["core"]["summary"]["max_killing_spree"]
 			self.medals_number.set(json["player"]["stats"]["core"]["summary"]["medals"]["total"])
 			self.damage_taken.set(json["player"]["stats"]["core"]["damage"]["taken"])
 			self.damage_dealt.set(json["player"]["stats"]["core"]["damage"]["dealt"])
@@ -137,7 +137,7 @@ Last game for **{self.pseudo}** :sunglasses:
 :smiling_face_with_tear: Assists: **{self.player_assists.acc}** (***+{self.player_assists.value}***)
 :cold_face: Betrayals: **{self.player_betrayals.acc}** (***+{self.player_betrayals.value}***)
 :zany_face: Suicides: **{self.player_suicides.acc}** (***+{self.player_suicides.value}***)
-:ok_hand: Max killing spree: **{self.max_killing_spree.acc}** (***+{self.max_killing_spree.value}***)
+:ok_hand: Max killing spree: **{self.max_killing_spree}**
 :medal: Medals number: **{self.medals_number.acc}** (***+{self.medals_number.value}***)
 
 :dagger: Damage taken: **{self.damage_taken.acc}** (***+{self.damage_taken.value}***)
@@ -151,7 +151,7 @@ Last game for **{self.pseudo}** :sunglasses:
 :alarm_clock: Average life duration: **{self.average_life_duration}**
 :clock: Game duration: **{self.duration}**
 
-Last update at {datetime.now().strftime('%d/%m/%Y %H:%M:%S')}
+Last update at ***{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}***
 
 
 """
