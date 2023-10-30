@@ -73,7 +73,7 @@ async def start_session(message, pseudo=None):
 	pseudo = get_pseudo(message, pseudo)
 	if pseudo not in sessions.keys():
 		current_date = date.today()
-		sessions[pseudo] = {"lastGame" : LastGame.load(f"{DIR}sessions/{pseudo}-{current_date}.pkl")}
+		sessions[pseudo] = {"lastGame" : LastGame.load(pseudo, f"{DIR}sessions/{pseudo}-{current_date}.pkl")}
 		lastGame = sessions[pseudo]["lastGame"]
 		lastGame.skip_first = True
 		await message.channel.send(f"{pseudo}'s session started\n")

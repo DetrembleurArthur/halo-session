@@ -135,6 +135,7 @@ class LastGame:
 		try:
 			with open(filename, 'rb') as file:
 				obj = pickle.load(file)
+			print(obj.to_str())
 			return obj
 		except FileNotFoundError:
 			return LastGame(pseudo)
