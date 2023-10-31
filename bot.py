@@ -8,8 +8,11 @@ import os
 from halostats import *
 import json
 from datetime import date
+from log import logger
 
-DIR = "/home/arthur/Documents/halo-session/"
+logger.info("starting")
+
+DIR = "/etc/halo-session/"
 TOKEN = os.getenv("DISCORD_HALO_SESSION_BOT_TOKEN")
 if TOKEN is None:
 	import sys
@@ -18,7 +21,6 @@ if TOKEN is None:
 intents = discord.Intents.default()
 intents.message_content = True
 
-#client = discord.Client(intents=intents)
 bot = commands.Bot(command_prefix="!",intents=intents)
 
 
@@ -28,6 +30,7 @@ users = {}
 def save_users():
 	with open(f'{DIR}users.json', 'w') as file:
 		file.write(json.dumps(users, indent=4))
+	logger.info(f"users saved in {DIR}users.json")
 
 def get_pseudo(message, pseudo=None):
 	if pseudo is not None: return pseudo
@@ -37,10 +40,12 @@ def get_pseudo(message, pseudo=None):
 async def private_message(message, text):
 	dm_channel = await message.author.create_dm()
 	await dm_channel.send(text)
+	logger.info(f"message sent to {message.author.name} : {text}")
 
 async def private_image(message, image):
 	dm_channel = await message.author.create_dm()
 	await dm_channel.send(file=image)
+	logger.info(f"image sent to {message.author.name}")
 
 async def clear_messages(message):
 	dm_channel = await message.author.create_dm()
@@ -57,6 +62,7 @@ def get_target_percentage(lastGame: LastGame, author_name: str):
 
 @bot.command(name="last")
 async def last_game(message, pseudo=None):
+	logger.info(f"{message.author.name} used '!last' command")
 	await clear_messages(message)
 	pseudo = get_pseudo(message, pseudo)
 	lastGame = LastGame(pseudo)
@@ -69,6 +75,8 @@ async def last_game(message, pseudo=None):
 
 @bot.command(name="start")
 async def start_session(message, pseudo=None):
+	SLEEP_TIME = 30
+	logger.info(f"{message.author.name} used '!start' command")
 	await clear_messages(message)
 	pseudo = get_pseudo(message, pseudo)
 	if pseudo not in sessions.keys():
@@ -86,16 +94,17 @@ async def start_session(message, pseudo=None):
 				await private_message(message, lastGame.to_str())
 				target_perc = get_target_percentage(lastGame, message.author.name)
 				if target_perc != None:
-					await private_message(message, f":goal: Goal xp: **{lastGame.score.acc}** / **{users[author_name]['target_xp']}** -> ***{target_perc:.2f}%***")
+					await private_message(message, f":goal: Goal xp: **{lastGame.score.acc}** / **{users[message.author.name]['target_xp']}** -> ***{target_perc:.2f}%***")
 				if lastGame.medals_number.value > 0:
 					await private_message(message, f"**{pseudo}**'s medals:")
 					image = lastGame.medals.create_image(pseudo)
 					async with message.typing(): await private_image(message, discord.File(image, filename=f"{pseudo}-medals.png"))
-			print("sleep for 30s...")
-			await asyncio.sleep(30)
+			logger.info(f"sleep for {SLEEP_TIME}s...")
+			await asyncio.sleep(SLEEP_TIME)
 
 @bot.command(name="stop")
 async def stop_session(message, pseudo=None):
+	logger.info(f"{message.author.name} used '!stop' command")
 	await clear_messages(message)
 	pseudo = get_pseudo(message, pseudo)
 	if pseudo in sessions.keys():
@@ -106,17 +115,18 @@ async def stop_session(message, pseudo=None):
 
 @bot.command(name="pseudo")
 async def register_pseudo(message, pseudo):
+	logger.info(f"{message.author.name} used '!register' command")
 	await clear_messages(message)
 	if message.author not in users.keys():
 		users[message.author.name] = {"pseudo" : pseudo, "target_xp" : 0}
 	else:
 		users[message.author.name]["pseudo"] = pseudo
 	save_users()
-	print(f"{pseudo} saved")
 	await private_message(message, f"**{pseudo}** registered for ***{message.author}***")
 
 @bot.command(name="target")
 async def target(message, target_xp: int=None, pseudo=None):
+	logger.info(f"{message.author.name} used '!target' command")
 	await clear_messages(message)
 	pseudo = get_pseudo(message, pseudo)
 	if message.author.name in users.keys() and target_xp != None:
@@ -131,6 +141,7 @@ async def target(message, target_xp: int=None, pseudo=None):
 
 @bot.command(name="whoami")
 async def whoami(message, pseudo=None):
+	logger.info(f"{message.author.name} used '!whoami' command")
 	await clear_messages(message)
 	pseudo = get_pseudo(message, pseudo)
 	await private_message(message, f"You are **{pseudo}**")
@@ -138,10 +149,10 @@ async def whoami(message, pseudo=None):
 @bot.event
 async def on_ready():
 	global users
-	print(f'{bot.user} has connected to Discord!')
+	logger.info(f'{bot.user} has connected to Discord!')
 	with open(f'{DIR}users.json', 'r') as file:
 		users = json.load(file)
-	print("users loaded")
+	logger.info("users loaded from {DIR}users.json")
 
 
 

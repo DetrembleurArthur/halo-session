@@ -7,15 +7,15 @@ import os
 import json
 import pickle
 from datetime import datetime
+from log import logger
 
-DIR = "/home/arthur/Documents/halo-session/"
+DIR = "/etc/halo-session/"
 
 def local_medal_file_exists(medal_id):
 	return os.path.exists(f"{DIR}medals/{medal_id}.png")
 
 
 def url_to_image(url):
-	print(url)
 	response = requests.get(url)
 	image = Image.open(BytesIO(response.content))
 	return image
@@ -50,23 +50,18 @@ class Medals:
 				url = halo.medal_url(medal[0])
 				medal_image = url_to_image(url)
 				medal_image.save(f"{DIR}medals/{medal[0]}.png")
-				print(f"save local medal image /home/arthur/Documents/halo-session/medals/{medal[0]}.png")
+				logger.info(f"save local medal image {DIR}medals/{medal[0]}.png")
 			else:
-				medal_image = Image.open(f"/home/arthur/Documents/halo-session/medals/{medal[0]}.png")
-				print(f"load local medal image /home/arthur/Documents/halo-session/medals/{medal[0]}.png")
+				medal_image = Image.open(f"{DIR}medals/{medal[0]}.png")
+				logger.info(f"load local medal image {DIR}medals/{medal[0]}.png")
 			medal_count = medal[1]
 			for i in range(medal_count):
-				print((temp%width*128, temp//width*128))
 				image.paste(medal_image, box=(temp%width*128, temp//width*128))
 				temp += 1
 		binary = BytesIO()
 		image.save(binary, "PNG")
 		binary.seek(0)
 		return binary
-
-	@staticmethod
-	def fetch_images():
-		pass
 
 
 class LastGame:
@@ -122,20 +117,22 @@ class LastGame:
 			self.game_id = json["id"]
 			self.skip_first = False
 		self.changed = self.game_id != json["id"]
+		logger.info("update Lastgame")
 		if self.changed:
+			logger.info("change detected")
 			self.update_from_json(json)
 
 	def save(self, filename):
 		with open(filename, 'wb') as file:
 			pickle.dump(self, file)
-			print(f'Object successfully saved to "{filename}"')
+			logger.info(f'LastGame successfully saved to "{filename}"')
 
 	@staticmethod
 	def load(pseudo, filename):
 		try:
 			with open(filename, 'rb') as file:
 				obj = pickle.load(file)
-			print(obj.to_str())
+			logger.info(f"{filename} LastGame restored")
 			return obj
 		except FileNotFoundError:
 			return LastGame(pseudo)
@@ -180,14 +177,7 @@ Last update at ***{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}***
 """
 
 if __name__ == "__main__":
-	from datetime import date
-	current_date = date.today()
-	pseudo = "SirArthurias"
-	game = LastGame(pseudo)
-	game.player_kills = 999
-	game.save(f"{pseudo}-{current_date}.pkl")
-	game2 = LastGame.load(pseudo, f"{pseudo}-{current_date}.pkl")
-	print(game2.player_kills)
+	pass
 
 
 
