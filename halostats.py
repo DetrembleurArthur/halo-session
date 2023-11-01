@@ -100,7 +100,8 @@ class LastGame:
 		self.map_name = json["details"]["map"]["name"]
 		self.game_mode = json["details"]["ugcgamevariant"]["name"]
 		self.player_rank = json["player"]["rank"]
-		self.player_team = json["player"]["properties"]["team"]["name"]
+		self.player_team = json["player"]["properties"]["team"]
+		if self.player_team != None: self.player_team = self.player_team["name"]
 		self.player_kills.set(json["player"]["stats"]["core"]["summary"]["kills"])
 		self.player_deaths.set(json["player"]["stats"]["core"]["summary"]["deaths"])
 		self.player_assists.set(json["player"]["stats"]["core"]["summary"]["assists"])
@@ -119,7 +120,7 @@ class LastGame:
 		self.average_life_duration = json["player"]["stats"]["core"]["average_life_duration"]["human"]
 		self.score.set(json["player"]["stats"]["core"]["scores"]["personal"])
 		self.duration = json["playable_duration"]["human"]
-		self.duration_seconds = json["playable_duration"]["seconds"]
+		self.duration_seconds.set(json["playable_duration"]["seconds"])
 		return True
 
 	def update(self):
@@ -183,13 +184,18 @@ Last game for **{self.pseudo}** :sunglasses:
 :dart: Shot accuracy: **{self.shots_accuracy:.2f}%**
 
 :alarm_clock: Average life duration: **{self.average_life_duration}**
-:clock: Game duration: **{self.duration}**
-:clock: Total in-game time: **{seconds_to_time_str(self.duration_seconds.acc)}**
-:clock: Score per second: **{self.score.acc / self.duration_seconds.acc:.2f}/s**
-:clock: Score per minute: **{self.score.acc / (self.duration_seconds.acc / 60):.2f}/m**
-:clock: Score per hour: **{self.score.acc / (self.duration_seconds.acc / (60 * 60)):.2f}/h**
 
-:nerd: Number of games today: {self.update_counter}
+:clock: Game duration: **{self.duration}**
+:clock: Game Score per second: **{self.score.value / self.duration_seconds.value:.2f}xp/s**
+:clock: Game Score per minute: **{self.score.value / (self.duration_seconds.value / 60):.2f}xp/m**
+:clock: Game Score per hour: **{self.score.value / (self.duration_seconds.value / (60 * 60)):.2f}xp/h**
+
+:clock: Total in-game time: **{seconds_to_time_str(self.duration_seconds.acc)}**
+:clock: Total Score per second: **{self.score.acc / self.duration_seconds.acc:.2f}xp/s**
+:clock: Total Score per minute: **{self.score.acc / (self.duration_seconds.acc / 60):.2f}xp/m**
+:clock: Total Score per hour: **{self.score.acc / (self.duration_seconds.acc / (60 * 60)):.2f}xp/h**
+
+:nerd: Number of games today: **{self.update_counter}**
 
 Last update at ***{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}***
 

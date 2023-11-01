@@ -93,13 +93,18 @@ async def start_session(message, pseudo=None):
 				await clear_messages(message)
 				await private_message(message, lastGame.to_str())
 				target_perc = get_target_percentage(lastGame, message.author.name)
-				target_xp = users[author_name]["target_xp"]
+				target_xp = users[message.author.name]["target_xp"]
 				if target_perc != None:
 					score_per_sec = lastGame.score.acc / lastGame.duration_seconds.acc
+					game_score_per_sec = lastGame.score.value / lastGame.duration_seconds.value
 					await private_message(message, f"""
 :goal: Target xp: **{lastGame.score.acc}** / **{users[message.author.name]['target_xp']}** -> ***{target_perc:.2f}%***
-:clock: Estimated time to reach target xp: **{seconds_to_time_str(target_xp // score_per_sec):.2f}**
-:clock: Time to reach target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc if target_xp-lastGame.score.acc>0 else 0) // score_per_sec):.2f}**
+
+:clock: (game scope) Estimated time to reach target xp: **{seconds_to_time_str(target_xp // game_score_per_sec)}**
+:clock: (game scope) Time to reach target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc) // game_score_per_sec)}**
+
+:clock: Estimated time to reach target xp: **{seconds_to_time_str(target_xp // score_per_sec)}**
+:clock: Time to reach target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc) // score_per_sec)}**
 """)
 				if lastGame.medals_number.value > 0:
 					image = lastGame.medals.create_image(pseudo)
@@ -156,7 +161,7 @@ async def on_ready():
 	logger.info(f'{bot.user} has connected to Discord!')
 	with open(f'{DIR}users.json', 'r') as file:
 		users = json.load(file)
-	logger.info("users loaded from {DIR}users.json")
+	logger.info(f"users loaded from {DIR}users.json")
 
 
 
