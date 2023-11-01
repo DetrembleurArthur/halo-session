@@ -87,11 +87,14 @@ class LastGame:
 		self.score = IncrementalVar()
 
 	def update_from_json(self, json):
+		self.winner = json["player"]["outcome"]
+		if self.winner == "dnf":
+			logger.info("ignore this game : crash or quit")
+			return False
 		self.game_id = json["id"]
 		self.map_name = json["details"]["map"]["name"]
 		self.game_mode = json["details"]["ugcgamevariant"]["name"]
 		self.player_rank = json["player"]["rank"]
-		self.winner = json["player"]["outcome"]
 		self.player_team = json["player"]["properties"]["team"]["name"]
 		self.player_kills.set(json["player"]["stats"]["core"]["summary"]["kills"])
 		self.player_deaths.set(json["player"]["stats"]["core"]["summary"]["deaths"])
@@ -111,6 +114,7 @@ class LastGame:
 		self.average_life_duration = json["player"]["stats"]["core"]["average_life_duration"]["human"]
 		self.score.set(json["player"]["stats"]["core"]["scores"]["personal"])
 		self.duration = json["playable_duration"]["human"]
+		return True
 
 	def update(self):
 		json = halo.get_last_game(self.pseudo)
@@ -120,8 +124,10 @@ class LastGame:
 		self.changed = self.game_id != json["id"]
 		if self.changed:
 			logger.info("change detected")
-			self.update_from_json(json)
-			self.update_counter += 1
+			if self.update_from_json(json):
+				self.update_counter += 1
+			else:
+				self.changed = False
 
 
 	def save(self, filename):
