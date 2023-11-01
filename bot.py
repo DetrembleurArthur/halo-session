@@ -93,8 +93,14 @@ async def start_session(message, pseudo=None):
 				await clear_messages(message)
 				await private_message(message, lastGame.to_str())
 				target_perc = get_target_percentage(lastGame, message.author.name)
+				target_xp = users[author_name]["target_xp"]
 				if target_perc != None:
-					await private_message(message, f":goal: Goal xp: **{lastGame.score.acc}** / **{users[message.author.name]['target_xp']}** -> ***{target_perc:.2f}%***")
+					score_per_sec = lastGame.score.acc / lastGame.duration_seconds.acc
+					await private_message(message, f"""
+:goal: Target xp: **{lastGame.score.acc}** / **{users[message.author.name]['target_xp']}** -> ***{target_perc:.2f}%***
+:clock: Estimated time to reach target xp: **{seconds_to_time_str(target_xp // score_per_sec):.2f}**
+:clock: Time to reach target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc if target_xp-lastGame.score.acc>0 else 0) // score_per_sec):.2f}**
+""")
 				if lastGame.medals_number.value > 0:
 					image = lastGame.medals.create_image(pseudo)
 					async with message.typing(): await private_image(message, discord.File(image, filename=f"{pseudo}-medals.png"))
