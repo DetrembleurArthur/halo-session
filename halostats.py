@@ -68,6 +68,7 @@ class LastGame:
 
 	def __init__(self, pseudo, skip_first=False):
 		self.pseudo = pseudo
+		self.update_counter = 0
 		self.game_id = "empty"
 		self.changed = False
 		self.skip_first = skip_first
@@ -117,10 +118,11 @@ class LastGame:
 			self.game_id = json["id"]
 			self.skip_first = False
 		self.changed = self.game_id != json["id"]
-		logger.info("update Lastgame")
 		if self.changed:
 			logger.info("change detected")
 			self.update_from_json(json)
+			self.update_counter += 1
+
 
 	def save(self, filename):
 		with open(filename, 'wb') as file:
@@ -170,6 +172,8 @@ Last game for **{self.pseudo}** :sunglasses:
 
 :alarm_clock: Average life duration: **{self.average_life_duration}**
 :clock: Game duration: **{self.duration}**
+
+:nerd: Number of games today: {self.update_counter}
 
 Last update at ***{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}***
 

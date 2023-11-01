@@ -96,10 +96,8 @@ async def start_session(message, pseudo=None):
 				if target_perc != None:
 					await private_message(message, f":goal: Goal xp: **{lastGame.score.acc}** / **{users[message.author.name]['target_xp']}** -> ***{target_perc:.2f}%***")
 				if lastGame.medals_number.value > 0:
-					await private_message(message, f"**{pseudo}**'s medals:")
 					image = lastGame.medals.create_image(pseudo)
 					async with message.typing(): await private_image(message, discord.File(image, filename=f"{pseudo}-medals.png"))
-			logger.info(f"sleep for {SLEEP_TIME}s...")
 			await asyncio.sleep(SLEEP_TIME)
 
 @bot.command(name="stop")
