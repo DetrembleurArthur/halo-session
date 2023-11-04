@@ -63,7 +63,6 @@ def get_target_percentage(lastGame: LastGame, author_name: str):
 @bot.command(name="last")
 async def last_game(message, pseudo=None):
 	logger.info(f"{message.author.name} used '!last' command")
-	await clear_messages(message)
 	pseudo = get_pseudo(message, pseudo)
 	lastGame = LastGame(pseudo)
 	lastGame.update()
@@ -77,7 +76,6 @@ async def last_game(message, pseudo=None):
 async def start_session(message, pseudo=None):
 	SLEEP_TIME = 30
 	logger.info(f"{message.author.name} used '!start' command")
-	await clear_messages(message)
 	pseudo = get_pseudo(message, pseudo)
 	if pseudo not in sessions.keys():
 		current_date = date.today()
@@ -90,7 +88,7 @@ async def start_session(message, pseudo=None):
 			lastGame.update()
 			if lastGame.changed:
 				lastGame.save(f"{DIR}sessions/{pseudo}-{current_date}.pkl")
-				await clear_messages(message)
+		
 				await private_message(message, lastGame.to_str())
 				target_perc = get_target_percentage(lastGame, message.author.name)
 				target_xp = users[message.author.name]["target_xp"]
@@ -100,11 +98,11 @@ async def start_session(message, pseudo=None):
 					await private_message(message, f"""
 :goal: Target xp: **{lastGame.score.acc}** / **{users[message.author.name]['target_xp']}** -> ***{target_perc:.2f}%***
 
-:clock: (game scope) Estimated time to reach target xp: **{seconds_to_time_str(target_xp // game_score_per_sec)}**
-:clock: (game scope) Time to reach target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc) // game_score_per_sec)}**
+:clock: (game) Tot. Time to target xp: **{seconds_to_time_str(target_xp // game_score_per_sec)}**
+:clock: (game) Time to target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc) // game_score_per_sec)}**
 
-:clock: Estimated time to reach target xp: **{seconds_to_time_str(target_xp // score_per_sec)}**
-:clock: Time to reach target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc) // score_per_sec)}**
+:clock: Tot. Time to target xp: **{seconds_to_time_str(target_xp // score_per_sec)}**
+:clock: Time to target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc) // score_per_sec)}**
 """)
 				if lastGame.medals_number.value > 0:
 					image = lastGame.medals.create_image(pseudo)
@@ -114,7 +112,6 @@ async def start_session(message, pseudo=None):
 @bot.command(name="stop")
 async def stop_session(message, pseudo=None):
 	logger.info(f"{message.author.name} used '!stop' command")
-	await clear_messages(message)
 	pseudo = get_pseudo(message, pseudo)
 	if pseudo in sessions.keys():
 		del sessions[pseudo]
@@ -125,7 +122,6 @@ async def stop_session(message, pseudo=None):
 @bot.command(name="pseudo")
 async def register_pseudo(message, pseudo):
 	logger.info(f"{message.author.name} used '!register' command")
-	await clear_messages(message)
 	if message.author not in users.keys():
 		users[message.author.name] = {"pseudo" : pseudo, "target_xp" : 0}
 	else:
@@ -136,7 +132,6 @@ async def register_pseudo(message, pseudo):
 @bot.command(name="target")
 async def target(message, target_xp: int=None, pseudo=None):
 	logger.info(f"{message.author.name} used '!target' command")
-	await clear_messages(message)
 	pseudo = get_pseudo(message, pseudo)
 	if message.author.name in users.keys() and target_xp != None:
 		target_xp = int(target_xp)
@@ -151,7 +146,6 @@ async def target(message, target_xp: int=None, pseudo=None):
 @bot.command(name="whoami")
 async def whoami(message, pseudo=None):
 	logger.info(f"{message.author.name} used '!whoami' command")
-	await clear_messages(message)
 	pseudo = get_pseudo(message, pseudo)
 	await private_message(message, f"You are **{pseudo}**")
 

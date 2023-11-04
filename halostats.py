@@ -162,7 +162,7 @@ Last game for **{self.pseudo}** :sunglasses:
 :triangular_flag_on_post: Mode: **{self.game_mode}**
 :v: Status: **{self.winner}**
 
-:video_game: Score: **{self.score.acc}** (+{self.score.value})
+:video_game: Score: **{self.score.acc}** (***+{self.score.value}***)
 
 :person_in_steamy_room: Team: **{self.player_team}**
 :man_student: Rank: **{self.player_rank}**
