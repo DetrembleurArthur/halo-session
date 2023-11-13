@@ -15,7 +15,7 @@ DIR = "/etc/halo-session/"
 def get_total_seconds_of_the_day():
 	nowtime = datetime.now()
 	midnight = nowtime.replace(hour=0, minute=0, second=0, microsecond=0)
-	return (maintenant - minuit).total_seconds()
+	return (nowtime - midnight).total_seconds()
 
 def seconds_to_time_str(seconds):
 	return " ".join([data[0]+data[1] for data in zip(str(timedelta(seconds=seconds)).split(':'), ["h", "m", "s"])])
