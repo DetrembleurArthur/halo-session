@@ -95,14 +95,22 @@ async def start_session(message, pseudo=None):
 				if target_perc != None:
 					score_per_sec = lastGame.score.acc / lastGame.duration_seconds.acc
 					game_score_per_sec = lastGame.score.value / lastGame.duration_seconds.value
+					day_score_per_sec = lastGame.score.acc / lastGame.total_sotd
+					day_game_score_per_sec = lastGame.score.value / lastGame.total_sotd
 					await private_message(message, f"""
 :goal: Target xp: **{lastGame.score.acc}** / **{users[message.author.name]['target_xp']}** -> ***{target_perc:.2f}%***
 
 :clock: (game) Tot. Time to target xp: **{seconds_to_time_str(target_xp // game_score_per_sec)}**
 :clock: (game) Time to target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc) // game_score_per_sec)}**
 
-:clock: Tot. Time to target xp: **{seconds_to_time_str(target_xp // score_per_sec)}**
-:clock: Time to target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc) // score_per_sec)}**
+:clock: (in-game) Tot. Time to target xp: **{seconds_to_time_str(target_xp // score_per_sec)}**
+:clock: (in-game) Time to target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc) // score_per_sec)}**
+
+:clock: (day-game) Tot. Time to target xp: **{seconds_to_time_str(target_xp // day_game_score_per_sec)}**
+:clock: (day-game) Time to target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc) // day_game_score_per_sec)}**
+
+:clock: (day) Tot. Time to target xp: **{seconds_to_time_str(target_xp // day_score_per_sec)}**
+:clock: (day) Time to target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc) // day_score_per_sec)}**
 """)
 				if lastGame.medals_number.value > 0:
 					image = lastGame.medals.create_image(pseudo)

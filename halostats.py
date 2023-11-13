@@ -12,6 +12,11 @@ from log import logger
 
 DIR = "/etc/halo-session/"
 
+def get_total_seconds_of_the_day():
+	nowtime = datetime.now()
+	midnight = nowtime.replace(hour=0, minute=0, second=0, microsecond=0)
+	return (maintenant - minuit).total_seconds()
+
 def seconds_to_time_str(seconds):
 	return " ".join([data[0]+data[1] for data in zip(str(timedelta(seconds=seconds)).split(':'), ["h", "m", "s"])])
 
@@ -90,6 +95,7 @@ class LastGame:
 		self.shots_missed = IncrementalVar()
 		self.score = IncrementalVar()
 		self.duration_seconds = IncrementalVar()
+		self.total_sotd = get_total_seconds_of_the_day()
 
 	def update_from_json(self, json):
 		self.winner = json["player"]["outcome"]
@@ -121,6 +127,7 @@ class LastGame:
 		self.score.set(json["player"]["stats"]["core"]["scores"]["personal"])
 		self.duration = json["playable_duration"]["human"]
 		self.duration_seconds.set(json["playable_duration"]["seconds"])
+		self.total_sotd = get_total_seconds_of_the_day()
 		return True
 
 	def update(self):
@@ -186,14 +193,22 @@ Last game for **{self.pseudo}** :sunglasses:
 :alarm_clock: Average life duration: **{self.average_life_duration}**
 
 :clock: Game duration: **{self.duration}**
-:clock: Game Score per second: **{self.score.value / self.duration_seconds.value:.2f}xp/s**
-:clock: Game Score per minute: **{self.score.value / (self.duration_seconds.value / 60):.2f}xp/m**
-:clock: Game Score per hour: **{self.score.value / (self.duration_seconds.value / (60 * 60)):.2f}xp/h**
+:clock: Game Score: **{self.score.value / self.duration_seconds.value:.2f}**xp/s
+:clock: Game Score: **{self.score.value / (self.duration_seconds.value / 60):.2f}**xp/m
+:clock: Game Score: **{self.score.value / (self.duration_seconds.value / (60 * 60)):.2f}**xp/h
 
 :clock: Total in-game time: **{seconds_to_time_str(self.duration_seconds.acc)}**
-:clock: Total Score per second: **{self.score.acc / self.duration_seconds.acc:.2f}xp/s**
-:clock: Total Score per minute: **{self.score.acc / (self.duration_seconds.acc / 60):.2f}xp/m**
-:clock: Total Score per hour: **{self.score.acc / (self.duration_seconds.acc / (60 * 60)):.2f}xp/h**
+:clock: Total Score: **{self.score.acc / self.duration_seconds.acc:.2f}**xp/s
+:clock: Total Score: **{self.score.acc / (self.duration_seconds.acc / 60):.2f}**xp/m
+:clock: Total Score: **{self.score.acc / (self.duration_seconds.acc / (60 * 60)):.2f}**xp/h
+
+:clock: Day Game Score: **{self.score.value / total_sotd:.2f}**xp/s
+:clock: Day Game Score: **{self.score.value / (total_sotd / 60):.2f}**xp/m
+:clock: Day Game Score: **{self.score.value / (total_sotd / (60 * 60)):.2f}**xp/h
+
+:clock: Day Total Score: **{self.score.acc / total_sotd:.2f}**xp/s
+:clock: Day Total Score: **{self.score.acc / (total_sotd / 60):.2f}**xp/m
+:clock: Day Total Score: **{self.score.acc / (total_sotd / (60 * 60)):.2f}**xp/h
 
 :nerd: Number of games today: **{self.update_counter}**
 
