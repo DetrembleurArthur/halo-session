@@ -202,13 +202,13 @@ Last game for **{self.pseudo}** :sunglasses:
 :clock: Total Score: **{self.score.acc / (self.duration_seconds.acc / 60):.2f}**xp/m
 :clock: Total Score: **{self.score.acc / (self.duration_seconds.acc / (60 * 60)):.2f}**xp/h
 
-:clock: Day Game Score: **{self.score.value / total_sotd:.2f}**xp/s
-:clock: Day Game Score: **{self.score.value / (total_sotd / 60):.2f}**xp/m
-:clock: Day Game Score: **{self.score.value / (total_sotd / (60 * 60)):.2f}**xp/h
+:clock: RT Game Score: **{self.score.value / self.total_sotd:.2f}**xp/s
+:clock: RT Game Score: **{self.score.value / (self.total_sotd / 60):.2f}**xp/m
+:clock: RT Game Score: **{self.score.value / (self.total_sotd / (60 * 60)):.2f}**xp/h
 
-:clock: Day Total Score: **{self.score.acc / total_sotd:.2f}**xp/s
-:clock: Day Total Score: **{self.score.acc / (total_sotd / 60):.2f}**xp/m
-:clock: Day Total Score: **{self.score.acc / (total_sotd / (60 * 60)):.2f}**xp/h
+:clock: RT Total Score: **{self.score.acc / self.total_sotd:.2f}**xp/s
+:clock: RT Total Score: **{self.score.acc / (self.total_sotd / 60):.2f}**xp/m
+:clock: RT Total Score: **{self.score.acc / (self.total_sotd / (60 * 60)):.2f}**xp/h
 
 :nerd: Number of games today: **{self.update_counter}**
 

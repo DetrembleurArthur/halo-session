@@ -106,11 +106,11 @@ async def start_session(message, pseudo=None):
 :clock: (in-game) Tot. Time to target xp: **{seconds_to_time_str(target_xp // score_per_sec)}**
 :clock: (in-game) Time to target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc) // score_per_sec)}**
 
-:clock: (day-game) Tot. Time to target xp: **{seconds_to_time_str(target_xp // day_game_score_per_sec)}**
-:clock: (day-game) Time to target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc) // day_game_score_per_sec)}**
+:clock: (RT-game) Tot. Time to target xp: **{seconds_to_time_str(target_xp // day_game_score_per_sec)}**
+:clock: (RT-game) Time to target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc) // day_game_score_per_sec)}**
 
-:clock: (day) Tot. Time to target xp: **{seconds_to_time_str(target_xp // day_score_per_sec)}**
-:clock: (day) Time to target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc) // day_score_per_sec)}**
+:clock: (RT) Tot. Time to target xp: **{seconds_to_time_str(target_xp // day_score_per_sec)}**
+:clock: (RT) Time to target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc) // day_score_per_sec)}**
 """)
 				if lastGame.medals_number.value > 0:
 					image = lastGame.medals.create_image(pseudo)
