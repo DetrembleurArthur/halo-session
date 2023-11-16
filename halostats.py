@@ -1,7 +1,5 @@
 import haloapi as halo
-from PIL import Image
 import requests
-from io import BytesIO
 import time
 import os
 import json
@@ -9,6 +7,9 @@ import pickle
 from datetime import datetime
 from datetime import timedelta
 from log import logger
+from io import BytesIO
+from PIL import Image
+import csv
 
 DIR = "/etc/halo-session/"
 
@@ -97,6 +98,18 @@ class LastGame:
 		self.duration_seconds = IncrementalVar()
 		self.total_sotd = get_total_seconds_of_the_day()
 
+	def save_csv(self):
+		filename = f"{DIR}{self.pseudo}_stats.csv"
+		if not os.path.exists(filename):
+			logger.info(f"create {filename}")
+			with open(filename, "w") as file:
+				writer = csv.writer(file, delimiter=';')
+				writer.writerow(["map", "mode", "kills", "deaths", "assists", "betrayals", "suicides", "max_killing_spree", "medals", "dmg_taken", "dmg_dealt", "shots_fired", "shots_hit", "shots_missed", "score", "duration"])
+		logger.info(f"save stats in {filename}")
+		with open(filename, "a") as file:
+				writer = csv.writer(file, delimiter=';')
+				writer.writerow([self.map_name, self.game_mode, self.player_kills.value, self.player_deaths.value, self.player_assists.value, self.player_betrayals.value, self.player_suicides.value, self.max_killing_spree, self.medals_number.value, self.damage_taken.value, self.damage_dealt.value, self.shots_fired.value, self.shots_hit.value, self.shots_missed.value, self.score.value, self.duration_seconds.value])
+
 	def update_from_json(self, json):
 		self.winner = json["player"]["outcome"]
 		if self.winner == "dnf":
@@ -176,6 +189,7 @@ Last game for **{self.pseudo}** :sunglasses:
 
 :archery: Kills: **{self.player_kills.acc}** (***+{self.player_kills.value}***)
 :skull: Deaths: **{self.player_deaths.acc}** (***+{self.player_deaths.value}***)
+:skull: Ratio: **{self.ratio}**
 :smiling_face_with_tear: Assists: **{self.player_assists.acc}** (***+{self.player_assists.value}***)
 :cold_face: Betrayals: **{self.player_betrayals.acc}** (***+{self.player_betrayals.value}***)
 :zany_face: Suicides: **{self.player_suicides.acc}** (***+{self.player_suicides.value}***)
@@ -196,19 +210,28 @@ Last game for **{self.pseudo}** :sunglasses:
 :clock: Game Score: **{self.score.value / self.duration_seconds.value:.2f}**xp/s
 :clock: Game Score: **{self.score.value / (self.duration_seconds.value / 60):.2f}**xp/m
 :clock: Game Score: **{self.score.value / (self.duration_seconds.value / (60 * 60)):.2f}**xp/h
+:clock: Game Score: **{self.score.value / (self.duration_seconds.value / (60 * 60*24)):.2f}**xp/d
 
 :clock: Total in-game time: **{seconds_to_time_str(self.duration_seconds.acc)}**
 :clock: Total Score: **{self.score.acc / self.duration_seconds.acc:.2f}**xp/s
 :clock: Total Score: **{self.score.acc / (self.duration_seconds.acc / 60):.2f}**xp/m
 :clock: Total Score: **{self.score.acc / (self.duration_seconds.acc / (60 * 60)):.2f}**xp/h
+:clock: Total Score: **{self.score.acc / (self.duration_seconds.acc / (60 * 60*24)):.2f}**xp/d
 
 :clock: RT Game Score: **{self.score.value / self.total_sotd:.2f}**xp/s
 :clock: RT Game Score: **{self.score.value / (self.total_sotd / 60):.2f}**xp/m
 :clock: RT Game Score: **{self.score.value / (self.total_sotd / (60 * 60)):.2f}**xp/h
+:clock: RT Game Score: **{self.score.value / (self.total_sotd / (60 * 60*24)):.2f}**xp/d
 
 :clock: RT Total Score: **{self.score.acc / self.total_sotd:.2f}**xp/s
 :clock: RT Total Score: **{self.score.acc / (self.total_sotd / 60):.2f}**xp/m
 :clock: RT Total Score: **{self.score.acc / (self.total_sotd / (60 * 60)):.2f}**xp/h
+:clock: RT Total Score: **{self.score.acc / (self.total_sotd / (60 * 60*24)):.2f}**xp/d
+
+:clock: RT-24h Total Score: **{self.score.acc / (24*60*60):.2f}**xp/s
+:clock: RT-24h Total Score: **{self.score.acc / (24*60):.2f}**xp/m
+:clock: RT-24h Total Score: **{self.score.acc / (24):.2f}**xp/h
+:clock: RT-24h Total Score: **{self.score.acc:.2f}**xp/d
 
 :nerd: Number of games today: **{self.update_counter}**
 

@@ -9,6 +9,8 @@ from halostats import *
 import json
 from datetime import date
 from log import logger
+from analysis import perform_pca
+
 
 logger.info("starting")
 
@@ -72,6 +74,14 @@ async def last_game(message, pseudo=None):
 		image = lastGame.medals.create_image(pseudo)
 		async with message.typing(): await private_image(message, discord.File(image, filename=f"{pseudo}-medals.png"))
 
+@bot.command(name="stats")
+async def last_game(message, pseudo=None):
+	logger.info(f"{message.author.name} used '!stats' command")
+	pseudo = get_pseudo(message, pseudo)
+	await private_message(message, f"performing PCA for {pseudo}")
+	image = perform_pca(pseudo)
+	async with message.typing(): await private_image(message, discord.File(image, filename=f"{pseudo}-pca.png"))
+
 @bot.command(name="start")
 async def start_session(message, pseudo=None):
 	SLEEP_TIME = 30
@@ -88,7 +98,7 @@ async def start_session(message, pseudo=None):
 			lastGame.update()
 			if lastGame.changed:
 				lastGame.save(f"{DIR}sessions/{pseudo}-{current_date}.pkl")
-		
+				lastGame.save_csv()
 				await private_message(message, lastGame.to_str())
 				target_perc = get_target_percentage(lastGame, message.author.name)
 				target_xp = users[message.author.name]["target_xp"]
@@ -100,17 +110,11 @@ async def start_session(message, pseudo=None):
 					await private_message(message, f"""
 :goal: Target xp: **{lastGame.score.acc}** / **{users[message.author.name]['target_xp']}** -> ***{target_perc:.2f}%***
 
-:clock: (game) Tot. Time to target xp: **{seconds_to_time_str(target_xp // game_score_per_sec)}**
-:clock: (game) Time to target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc) // game_score_per_sec)}**
+:clock: (one-game) time:     **{seconds_to_time_str(target_xp // game_score_per_sec)}**
+:clock: (one-game) tot time: **{seconds_to_time_str((target_xp-lastGame.score.acc) // game_score_per_sec)}**
 
-:clock: (in-game) Tot. Time to target xp: **{seconds_to_time_str(target_xp // score_per_sec)}**
-:clock: (in-game) Time to target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc) // score_per_sec)}**
-
-:clock: (RT-game) Tot. Time to target xp: **{seconds_to_time_str(target_xp // day_game_score_per_sec)}**
-:clock: (RT-game) Time to target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc) // day_game_score_per_sec)}**
-
-:clock: (RT) Tot. Time to target xp: **{seconds_to_time_str(target_xp // day_score_per_sec)}**
-:clock: (RT) Time to target xp: **{seconds_to_time_str((target_xp-lastGame.score.acc) // day_score_per_sec)}**
+:clock: (in-game) time:     **{seconds_to_time_str(target_xp // score_per_sec)}**
+:clock: (in-game) tot time: **{seconds_to_time_str((target_xp-lastGame.score.acc) // score_per_sec)}**
 """)
 				if lastGame.medals_number.value > 0:
 					image = lastGame.medals.create_image(pseudo)
