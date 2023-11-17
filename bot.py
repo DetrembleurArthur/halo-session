@@ -78,7 +78,7 @@ async def last_game(message, pseudo=None):
 async def last_game(message, pseudo=None):
 	logger.info(f"{message.author.name} used '!stats' command")
 	pseudo = get_pseudo(message, pseudo)
-	await private_message(message, f"performing PCA for {pseudo}")
+	await private_message(message, f"performing PCA for **{pseudo}**")
 	image = perform_pca(pseudo)
 	async with message.typing(): await private_image(message, discord.File(image, filename=f"{pseudo}-pca.png"))
 
@@ -100,13 +100,14 @@ async def start_session(message, pseudo=None):
 				lastGame.save(f"{DIR}sessions/{pseudo}-{current_date}.pkl")
 				lastGame.save_csv()
 				await private_message(message, lastGame.to_str())
+				await private_message(message, lastGame.get_timing_stats())
 				target_perc = get_target_percentage(lastGame, message.author.name)
 				target_xp = users[message.author.name]["target_xp"]
 				if target_perc != None:
 					score_per_sec = lastGame.score.acc / lastGame.duration_seconds.acc
 					game_score_per_sec = lastGame.score.value / lastGame.duration_seconds.value
-					day_score_per_sec = lastGame.score.acc / lastGame.total_sotd
-					day_game_score_per_sec = lastGame.score.value / lastGame.total_sotd
+					session_score_per_sec = lastGame.score.acc / lastGame.session_time
+					session_game_score_per_sec = lastGame.score.value / lastGame.session_time
 					await private_message(message, f"""
 :goal: Target xp: **{lastGame.score.acc}** / **{users[message.author.name]['target_xp']}** -> ***{target_perc:.2f}%***
 
@@ -115,6 +116,12 @@ async def start_session(message, pseudo=None):
 
 :clock: (in-game) time:     **{seconds_to_time_str(target_xp // score_per_sec)}**
 :clock: (in-game) tot time: **{seconds_to_time_str((target_xp-lastGame.score.acc) // score_per_sec)}**
+
+:clock: (RTS one-game) time:     **{seconds_to_time_str(target_xp // session_game_score_per_sec)}**
+:clock: (RTS one-game) tot time: **{seconds_to_time_str((target_xp-lastGame.score.acc) // session_game_score_per_sec)}**
+
+:clock: (RTS) time:     **{seconds_to_time_str(target_xp // session_score_per_sec)}**
+:clock: (RTS) tot time: **{seconds_to_time_str((target_xp-lastGame.score.acc) // session_score_per_sec)}**
 """)
 				if lastGame.medals_number.value > 0:
 					image = lastGame.medals.create_image(pseudo)

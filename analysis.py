@@ -17,7 +17,7 @@ def perform_pca(pseudo):
 	complete = pandas.read_csv(f"{DIR}{pseudo}_stats.csv", delimiter=";").dropna()
 	print(complete.head())
 	print(complete)
-	complete_numeric = complete.drop(columns=["map", "mode"])
+	complete_numeric = complete.drop(columns=["map", "mode", "betrayals", "suicides"])
 	scaler = StandardScaler()
 	complete_numeric[complete_numeric.columns] = scaler.fit_transform(complete_numeric[complete_numeric.columns])
 	print(complete_numeric.head())

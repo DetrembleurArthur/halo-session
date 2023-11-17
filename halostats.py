@@ -77,6 +77,8 @@ class Medals:
 class LastGame:
 
 	def __init__(self, pseudo, skip_first=False):
+		self.begin_timestamp = datetime.now()
+		self.session_time = (datetime.now()-self.begin_timestamp).total_seconds()
 		self.pseudo = pseudo
 		self.update_counter = 0
 		self.game_id = "empty"
@@ -153,6 +155,7 @@ class LastGame:
 			logger.info("change detected")
 			if self.update_from_json(json):
 				self.update_counter += 1
+				self.session_time = (datetime.now()-self.begin_timestamp).total_seconds()
 			else:
 				self.changed = False
 
@@ -172,51 +175,30 @@ class LastGame:
 		except FileNotFoundError:
 			return LastGame(pseudo)
 
-
-	def to_str(self):
+	def get_timing_stats(self):
 		return f"""
-
-Last game for **{self.pseudo}** :sunglasses:
-
-:map: Map: **{self.map_name}**
-:triangular_flag_on_post: Mode: **{self.game_mode}**
-:v: Status: **{self.winner}**
-
-:video_game: Score: **{self.score.acc}** (***+{self.score.value}***)
-
-:person_in_steamy_room: Team: **{self.player_team}**
-:man_student: Rank: **{self.player_rank}**
-
-:archery: Kills: **{self.player_kills.acc}** (***+{self.player_kills.value}***)
-:skull: Deaths: **{self.player_deaths.acc}** (***+{self.player_deaths.value}***)
-:skull: Ratio: **{self.ratio}**
-:smiling_face_with_tear: Assists: **{self.player_assists.acc}** (***+{self.player_assists.value}***)
-:cold_face: Betrayals: **{self.player_betrayals.acc}** (***+{self.player_betrayals.value}***)
-:zany_face: Suicides: **{self.player_suicides.acc}** (***+{self.player_suicides.value}***)
-:ok_hand: Max killing spree: **{self.max_killing_spree}**
-:medal: Medals number: **{self.medals_number.acc}** (***+{self.medals_number.value}***)
-
-:dagger: Damage taken: **{self.damage_taken.acc}** (***+{self.damage_taken.value}***)
-:boom: Damage dealt: **{self.damage_dealt.acc}** (***+{self.damage_dealt.value}***)
-
-:fire: Shots fired: **{self.shots_fired.acc}** (***+{self.shots_fired.value}***)
-:heart_on_fire: Shots hit: **{self.shots_hit.acc}** (***+{self.shots_hit.value}***)
-:firefighter: Shots missed: **{self.shots_missed.acc}** (***+{self.shots_missed.value}***)
-:dart: Shot accuracy: **{self.shots_accuracy:.2f}%**
-
-:alarm_clock: Average life duration: **{self.average_life_duration}**
-
-:clock: Game duration: **{self.duration}**
+:alarm_clock: Game duration: **{self.duration}**
 :clock: Game Score: **{self.score.value / self.duration_seconds.value:.2f}**xp/s
 :clock: Game Score: **{self.score.value / (self.duration_seconds.value / 60):.2f}**xp/m
 :clock: Game Score: **{self.score.value / (self.duration_seconds.value / (60 * 60)):.2f}**xp/h
 :clock: Game Score: **{self.score.value / (self.duration_seconds.value / (60 * 60*24)):.2f}**xp/d
 
-:clock: Total in-game time: **{seconds_to_time_str(self.duration_seconds.acc)}**
+:alarm_clock: Total in-game time: **{seconds_to_time_str(self.duration_seconds.acc)}**
 :clock: Total Score: **{self.score.acc / self.duration_seconds.acc:.2f}**xp/s
 :clock: Total Score: **{self.score.acc / (self.duration_seconds.acc / 60):.2f}**xp/m
 :clock: Total Score: **{self.score.acc / (self.duration_seconds.acc / (60 * 60)):.2f}**xp/h
 :clock: Total Score: **{self.score.acc / (self.duration_seconds.acc / (60 * 60*24)):.2f}**xp/d
+
+:alarm_clock: Total RTS time: **{seconds_to_time_str(self.session_time)}**
+:clock: RTS Total Score: **{self.score.acc / self.session_time:.2f}**xp/s
+:clock: RTS Total Score: **{self.score.acc / (self.session_time / 60):.2f}**xp/m
+:clock: RTS Total Score: **{self.score.acc / (self.session_time / (60 * 60)):.2f}**xp/h
+:clock: RTS Total Score: **{self.score.acc / (self.session_time / (60 * 60*24)):.2f}**xp/d
+
+:clock: RTS Game Score: **{self.score.value / self.session_time:.2f}**xp/s
+:clock: RTS Game Score: **{self.score.value / (self.session_time / 60):.2f}**xp/m
+:clock: RTS Game Score: **{self.score.value / (self.session_time / (60 * 60)):.2f}**xp/h
+:clock: RTS Game Score: **{self.score.value / (self.session_time / (60 * 60*24)):.2f}**xp/d
 
 :clock: RT Game Score: **{self.score.value / self.total_sotd:.2f}**xp/s
 :clock: RT Game Score: **{self.score.value / (self.total_sotd / 60):.2f}**xp/m
@@ -237,7 +219,40 @@ Last game for **{self.pseudo}** :sunglasses:
 
 Last update at ***{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}***
 
+"""
 
+	def to_str(self):
+		return f"""
+
+Last game for **{self.pseudo}** :sunglasses:
+
+:map: Map: **{self.map_name}**
+:triangular_flag_on_post: Mode: **{self.game_mode}**
+:v: Status: **{self.winner}**
+
+:video_game: Score: **{self.score.acc}** (***+{self.score.value}***)
+
+:person_in_steamy_room: Team: **{self.player_team}**
+:man_student: Rank: **{self.player_rank}**
+
+:archery: Kills: **{self.player_kills.acc}** (***+{self.player_kills.value}***)
+:skull: Deaths: **{self.player_deaths.acc}** (***+{self.player_deaths.value}***)
+:skull: Ratio: **{self.ratio:.2f}**
+:smiling_face_with_tear: Assists: **{self.player_assists.acc}** (***+{self.player_assists.value}***)
+:cold_face: Betrayals: **{self.player_betrayals.acc}** (***+{self.player_betrayals.value}***)
+:zany_face: Suicides: **{self.player_suicides.acc}** (***+{self.player_suicides.value}***)
+:ok_hand: Max killing spree: **{self.max_killing_spree}**
+:medal: Medals number: **{self.medals_number.acc}** (***+{self.medals_number.value}***)
+
+:dagger: Damage taken: **{self.damage_taken.acc}** (***+{self.damage_taken.value}***)
+:boom: Damage dealt: **{self.damage_dealt.acc}** (***+{self.damage_dealt.value}***)
+
+:fire: Shots fired: **{self.shots_fired.acc}** (***+{self.shots_fired.value}***)
+:heart_on_fire: Shots hit: **{self.shots_hit.acc}** (***+{self.shots_hit.value}***)
+:firefighter: Shots missed: **{self.shots_missed.acc}** (***+{self.shots_missed.value}***)
+:dart: Shot accuracy: **{self.shots_accuracy:.2f}%**
+
+:alarm_clock: Average life duration: **{self.average_life_duration}**
 """
 
 if __name__ == "__main__":
