@@ -40,7 +40,7 @@ def dump_games(pseudo):
 		result = result.json()["data"]
 		if len(result) == 0:
 			break
-		games.append(result)
+		games.extend(result)
 		offset += 25
 		print(f"{pseudo} games dumped: {offset}")
 	print("saving")
