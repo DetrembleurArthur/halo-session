@@ -155,7 +155,7 @@ class LastGame:
 			logger.info("change detected")
 			if self.update_from_json(json):
 				self.update_counter += 1
-				self.session_time = (datetime.now()-self.begin_timestamp).total_seconds()
+				self.session_time = int((datetime.now()-self.begin_timestamp).total_seconds())
 			else:
 				self.changed = False
 
@@ -194,16 +194,6 @@ class LastGame:
 :clock: RTS Total Score: **{self.score.acc / (self.session_time / 60):.2f}**xp/m
 :clock: RTS Total Score: **{self.score.acc / (self.session_time / (60 * 60)):.2f}**xp/h
 :clock: RTS Total Score: **{self.score.acc / (self.session_time / (60 * 60*24)):.2f}**xp/d
-
-:clock: RTS Game Score: **{self.score.value / self.session_time:.2f}**xp/s
-:clock: RTS Game Score: **{self.score.value / (self.session_time / 60):.2f}**xp/m
-:clock: RTS Game Score: **{self.score.value / (self.session_time / (60 * 60)):.2f}**xp/h
-:clock: RTS Game Score: **{self.score.value / (self.session_time / (60 * 60*24)):.2f}**xp/d
-
-:clock: RT Game Score: **{self.score.value / self.total_sotd:.2f}**xp/s
-:clock: RT Game Score: **{self.score.value / (self.total_sotd / 60):.2f}**xp/m
-:clock: RT Game Score: **{self.score.value / (self.total_sotd / (60 * 60)):.2f}**xp/h
-:clock: RT Game Score: **{self.score.value / (self.total_sotd / (60 * 60*24)):.2f}**xp/d
 
 :clock: RT Total Score: **{self.score.acc / self.total_sotd:.2f}**xp/s
 :clock: RT Total Score: **{self.score.acc / (self.total_sotd / 60):.2f}**xp/m

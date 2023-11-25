@@ -10,6 +10,7 @@ import json
 from datetime import date
 from log import logger
 from analysis import perform_pca
+from analysis import perform_pca_ind
 
 
 logger.info("starting")
@@ -80,7 +81,9 @@ async def last_game(message, pseudo=None):
 	pseudo = get_pseudo(message, pseudo)
 	await private_message(message, f"performing PCA for **{pseudo}**")
 	image = perform_pca(pseudo)
-	async with message.typing(): await private_image(message, discord.File(image, filename=f"{pseudo}-pca.png"))
+	async with message.typing(): await private_image(message, discord.File(image, filename=f"{pseudo}-var-pca.png"))
+	image = perform_pca_ind(pseudo, "mode")
+	async with message.typing(): await private_image(message, discord.File(image, filename=f"{pseudo}-ind-pca.png"))
 
 @bot.command(name="start")
 async def start_session(message, pseudo=None):
@@ -105,20 +108,12 @@ async def start_session(message, pseudo=None):
 				target_xp = users[message.author.name]["target_xp"]
 				if target_perc != None:
 					score_per_sec = lastGame.score.acc / lastGame.duration_seconds.acc
-					game_score_per_sec = lastGame.score.value / lastGame.duration_seconds.value
 					session_score_per_sec = lastGame.score.acc / lastGame.session_time
-					session_game_score_per_sec = lastGame.score.value / lastGame.session_time
 					await private_message(message, f"""
 :goal: Target xp: **{lastGame.score.acc}** / **{users[message.author.name]['target_xp']}** -> ***{target_perc:.2f}%***
 
-:clock: (one-game) time:     **{seconds_to_time_str(target_xp // game_score_per_sec)}**
-:clock: (one-game) tot time: **{seconds_to_time_str((target_xp-lastGame.score.acc) // game_score_per_sec)}**
-
 :clock: (in-game) time:     **{seconds_to_time_str(target_xp // score_per_sec)}**
 :clock: (in-game) tot time: **{seconds_to_time_str((target_xp-lastGame.score.acc) // score_per_sec)}**
-
-:clock: (RTS one-game) time:     **{seconds_to_time_str(target_xp // session_game_score_per_sec)}**
-:clock: (RTS one-game) tot time: **{seconds_to_time_str((target_xp-lastGame.score.acc) // session_game_score_per_sec)}**
 
 :clock: (RTS) time:     **{seconds_to_time_str(target_xp // session_score_per_sec)}**
 :clock: (RTS) tot time: **{seconds_to_time_str((target_xp-lastGame.score.acc) // session_score_per_sec)}**
@@ -167,6 +162,12 @@ async def whoami(message, pseudo=None):
 	logger.info(f"{message.author.name} used '!whoami' command")
 	pseudo = get_pseudo(message, pseudo)
 	await private_message(message, f"You are **{pseudo}**")
+
+@bot.command(name="hello")
+async def whoami(message, pseudo=None):
+	logger.info(f"{message.author.name} used '!hello' command")
+	#await private_message(message, f"Hello :green_apple:")
+	await private_message(message, f"Hello :apple:")
 
 @bot.event
 async def on_ready():
