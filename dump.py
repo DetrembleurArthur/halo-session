@@ -44,7 +44,7 @@ def dump_games(pseudo):
 		offset += 25
 		print(f"{pseudo} games dumped: {offset}")
 	print("saving")
-	with open(f"{pseudo}_games.json", "wt") as file:
+	with open(f"/var/www/html/{pseudo}_games.json", "wt") as file:
 		file.write(json.dumps({f"games": games}, indent=4))
 	print("games saved")
 
