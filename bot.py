@@ -167,11 +167,15 @@ async def whoami(message, pseudo=None):
 @bot.command(name="dump")
 async def dumpg(message, pseudo=None):
 	logger.info(f"{message.author.name} used '!dump' command")
-	pseudo = get_pseudo(message, pseudo)
-	await private_message(message, f"Dumping games for **{pseudo}**")
-	await private_message(message, f"please wait...")
-	dump_games(pseudo)
-	await private_message(message, f"You are **{pseudo}**")
+	try:
+		pseudo = get_pseudo(message, pseudo)
+		await private_message(message, f"Dumping games for **{pseudo}**")
+		await private_message(message, f"please wait...")
+		dump_games(pseudo)
+		await private_message(message, f"**{pseudo}'s games dumped**")
+	except e as Exception:
+		await private_message(message, f"error")
+		raise e
 
 @bot.command(name="hello")
 async def whoami(message, pseudo=None):
