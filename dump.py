@@ -169,13 +169,13 @@ class GameRecord:
 
 
 DIR = "/var/www/html/"
-NGINX_HTML = "..."
+NGINX_HTML = "index.nginx-debian.html"
 
 def dump_games(pseudo):
 	print(f"dump {pseudo} games")
 	offset = 0
 	filename = f"{DIR}halo_games/{pseudo}_games.csv"
-	last_gameid_filename = f"{DIR}halo_games/{pseudo}.txt"
+	last_gameid_filename = f"{DIR}halo_games/.{pseudo}_lastgameid"
 	last_gameid = ""
 	exists = os.path.exists(filename)
 	if os.path.exists(last_gameid_filename):
@@ -187,10 +187,13 @@ def dump_games(pseudo):
 		writer = csv.writer(file, delimiter=';')
 		if not exists:
 			writer.writerow(game.header())
-			with open(f"{DIR}{NGINX_HTML}", "at") as nginx: nginx.write(f"<a href='{filename}' download></a><br>\n")
+			with open(f"{DIR}{NGINX_HTML}", "at") as nginx: nginx.write(f"<a href='./halo_games/{pseudo}_games.csv' download>{pseudo}:csv</a><br>\n")
 		while running:
 			url = f"https://sr-nextjs.vercel.app/api/halodotapi?path=%2Fgames%2Fhalo-infinite%2Fstats%2Fmultiplayer%2Fplayers%2F{pseudo}%2Fmatches%3Ftype%3Dmatchmaking%26count%3D25%26offset%3D{offset}"
 			result = requests.get(url)
+			if not "data" in result.json():
+				running = False
+				break
 			result = result.json()["data"]
 			if len(result) == 0:
 				break
