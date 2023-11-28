@@ -172,8 +172,8 @@ async def dumpg(message, pseudo=None):
 		await private_message(message, f"Dumping games for **{pseudo}**")
 		await private_message(message, f"please wait...")
 		dump_games(pseudo)
-		await private_message(message, f"**{pseudo}'s games dumped**")
-	except e as Exception:
+		await private_message(message, f"**{pseudo}**'s games dumped")
+	except Exception as e:
 		await private_message(message, f"error")
 		raise e
 
