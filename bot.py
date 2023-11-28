@@ -11,6 +11,7 @@ from datetime import date
 from log import logger
 from analysis import perform_pca
 from analysis import perform_pca_ind
+from dump import dump_games
 
 
 logger.info("starting")
@@ -161,6 +162,15 @@ async def target(message, target_xp: int=None, pseudo=None):
 async def whoami(message, pseudo=None):
 	logger.info(f"{message.author.name} used '!whoami' command")
 	pseudo = get_pseudo(message, pseudo)
+	await private_message(message, f"You are **{pseudo}**")
+
+@bot.command(name="dump")
+async def dumpg(message, pseudo=None):
+	logger.info(f"{message.author.name} used '!dump' command")
+	pseudo = get_pseudo(message, pseudo)
+	await private_message(message, f"Dumping games for **{pseudo}**")
+	await private_message(message, f"please wait...")
+	dump_games(pseudo)
 	await private_message(message, f"You are **{pseudo}**")
 
 @bot.command(name="hello")
