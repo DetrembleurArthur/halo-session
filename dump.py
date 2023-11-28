@@ -3,6 +3,7 @@ import sys
 import json
 import os
 import csv
+from log import logger
 
 """import pymongo
 
@@ -172,7 +173,7 @@ DIR = "/var/www/html/"
 NGINX_HTML = "index.nginx-debian.html"
 
 def dump_games(pseudo):
-	print(f"dump {pseudo} games")
+	logger.info(f"dump {pseudo} games")
 	offset = 0
 	filename = f"{DIR}halo_games/{pseudo}_games.csv"
 	last_gameid_filename = f"{DIR}halo_games/.{pseudo}_lastgameid"
@@ -209,7 +210,7 @@ def dump_games(pseudo):
 				game.save(writer)
 				offset += 1
 			print(f"{pseudo} games dumped: {offset}")
-		print(f"games saved to {filename}")
+		logger.info(f"games saved to {filename}")
 
 if __name__ == "__main__":
 	dump_games(sys.argv[1])
