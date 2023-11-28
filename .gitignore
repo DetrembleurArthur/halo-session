@@ -5,6 +5,7 @@ session_infos.txt
 *$py.class
 medals/
 sessions/
+statscsv/
 users.txt
 # C extensions
 *.so
