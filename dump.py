@@ -185,7 +185,7 @@ def dump_games(pseudo):
 	game = GameRecord()
 	running = True
 	with open(filename, "at") as file:
-		writer = csv.writer(file, delimiter=';')
+		writer = csv.writer(file, delimiter=';', quotechar='"', quoting=csv.QUOTE_NONNUMERIC)
 		if not exists:
 			writer.writerow(game.header())
 			with open(f"{DIR}{NGINX_HTML}", "at") as nginx: nginx.write(f"<a href='./halo_games/{pseudo}_games.csv' download>{pseudo}:csv</a><br>\n")
