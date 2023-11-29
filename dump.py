@@ -211,6 +211,7 @@ def dump_games(pseudo):
 				offset += 1
 			print(f"{pseudo} games dumped: {offset}")
 		logger.info(f"games saved to {filename}")
+	return offset
 
 if __name__ == "__main__":
 	dump_games(sys.argv[1])
